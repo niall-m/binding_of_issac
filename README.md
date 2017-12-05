@@ -18,7 +18,7 @@ This app will consist of a single screen with the simulation canvas, player cont
 
 Player controls along the left side will include Pause (P), Action (space bar), and directional move (left, right, up, down arrow keys).
 
-On the top near the left there will be an a toggle music/sound button.
+On the top near the left there will be a toggle music/sound button.
 
 ![wireframes](https://github.com/niall-m/binding_of_issac/blob/master/images/binding_of_issac_wireframe.png)
 
