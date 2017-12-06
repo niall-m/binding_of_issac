@@ -1,5 +1,5 @@
 module.exports = {
-    entry: './issac/game.js',
+    entry: './issac/binding_of_issac.js',
     output: {
         filename: './bundle.js'
     },
