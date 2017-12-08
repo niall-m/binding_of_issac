@@ -27,7 +27,6 @@ body {
 
 .instruction-container {
     display: block;
-    /* border: 1px solid black; */
     padding: 10px;
     min-width: 140px;
     min-height: 100px;
@@ -39,6 +38,6 @@ body {
     padding: 10px;
 }
 
-/* #canvas {
-    background:url("./images/background.png");
-} */
+#points-display {
+
+}
