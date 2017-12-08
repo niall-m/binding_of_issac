@@ -112,7 +112,7 @@ class Game {
 
         document.addEventListener("keypress", e => {
             // console.log('key press');
-            if (e.key === 80) {
+            if (e.key === "p") {
                 this.togglePause();
             } else {
                 if (this.paused) {
