@@ -20,7 +20,7 @@ Player controls along the left side will include Pause (P), Action (space bar), 
 
 On the top near the left there will be a toggle music/sound button.
 
-![wireframes](https://github.com/niall-m/binding_of_issac/blob/master/images/binding_of_issac_wireframe.png)
+![wireframes](https://github.com/niall-m/binding_of_issac/blob/master/assets/wireframes.png)
 
 ### Architecture and Technology
 
