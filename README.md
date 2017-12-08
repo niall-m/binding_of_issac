@@ -1,5 +1,7 @@
 # Binding Of Issac
 
+(Live Link)(https://niall-m.github.io/binding_of_issac/)
+
 ### Background and Overview
 
 The original game, The Binding of Isaac, is a dungeon crawl where the player tries to fight monsters and survive for as long as possible. My clone, Binding of Issac, will attempt to recreate a similar, albeit simpler gameplay, which will consist of a single screen with the game canvas, player score, controlls, and links to github & linkedIn.
