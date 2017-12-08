@@ -129,11 +129,11 @@ class Game {
             if (this.paused) {
                 return;
             } else {
-                console.log(this.keysDown);
+                // console.log(this.keysDown);
                 delete this.keysDown[e.key];
                 this.hero.move(e, this.keysDown);
 
-                console.log(this.keysDown);
+                // console.log(this.keysDown);
             }
         }, false);
     }
