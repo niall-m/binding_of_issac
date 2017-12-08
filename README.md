@@ -1,6 +1,6 @@
 # Binding Of Issac
 
-![Live Link](https://niall-m.github.io/binding_of_issac/)
+[Live Link](https://niall-m.github.io/binding_of_issac/)
 
 ### Background and Overview
 
