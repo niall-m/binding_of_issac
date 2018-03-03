@@ -292,15 +292,15 @@ class Coin {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.width = 50;
+        this.width = 46;
         this.height = 50;
         this.coinImage = new Image();
         // this.coinImage.src = "https://i.imgur.com/SJtG1rE.png";
-        this.coinImage.src = "./assets/bitcoin_sprite-.png";
+        this.coinImage.src = "./assets/coin-sprite.png";
         this.frameIndex = 0;
         this.tickCount = 0;
         this.ticksPerFrame = this.ticksPerFrame || 4;
-        this.numberOfFrames = this.numberOfFrames || 6;
+        this.numberOfFrames = this.numberOfFrames || 10;
     }
 
     update() {        
@@ -312,8 +312,23 @@ class Coin {
             } else {
                 this.frameIndex = 0;
             }
-            this.frameIndex += 1;
+            // this.frameIndex += 1;
           }
+    }
+
+    render(ctx) {
+        this.update(this);
+        ctx.drawImage(
+            this.coinImage,
+            this.frameIndex * 1000 / this.numberOfFrames,
+            0,
+            1000 / this.numberOfFrames,
+            100,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
     }
 
     collideWith(obj2) {
@@ -327,21 +342,6 @@ class Coin {
         else {
             return false;
         }
-    }
-
-    render(ctx) {
-        this.update(this);
-        ctx.drawImage(
-            this.coinImage,
-            this.frameIndex * this.width,
-            0,
-            this.width,
-            this.height,
-            this.x,
-            this.y,
-            this.width,
-            this.height
-        );
     }
 }
 
