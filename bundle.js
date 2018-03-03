@@ -225,6 +225,7 @@ class Hero {
         this.heroImage = new Image();
         this.heroImage.src = "./assets/knight.png";
 
+        this.flipped = false;
         this.paused = false;
         this.keysDown = {};
 
@@ -255,12 +256,14 @@ class Hero {
         if (65 in this.keysDown || 37 in this.keysDown)  {
             if (this.x > 30) {    
                 this.x -= this.speed * modifier;
+                this.flipped = true;
             }
         }
         // holding right, 'd' or arrow
         if (68 in this.keysDown || 39 in this.keysDown) {
             if (this.x < 600) {    
                 this.x += this.speed * modifier;
+                this.flipped = false;
             }
         }
         // holding up, 'w' or arrow
@@ -278,7 +281,14 @@ class Hero {
     }
 
     render(ctx) {
-        ctx.drawImage(this.heroImage, this.x, this.y, 60, 60);
+        if (this.flipped) {
+            ctx.scale(-1,1);
+            ctx.drawImage(this.heroImage, -this.x - this.heroImage.width, this.y, 60, 60);
+            ctx.scale(-1,1);
+        }
+        else {
+            ctx.drawImage(this.heroImage, this.x, this.y, 60, 60);
+        }
     }
 }
 
