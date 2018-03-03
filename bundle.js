@@ -107,6 +107,12 @@ class Game {
         this.points = 0;
         this.paused = false;
         // this.gameOver = false;
+
+        document.addEventListener("keydown", e => {
+            if (e.keyCode === 80) {
+                this.togglePause();
+            }
+        });
     }
 
     remove(object) {
@@ -165,8 +171,6 @@ class Game {
         this.allObjects().forEach((obj) => obj.render(this.ctx));
     }
 
-    // update(this.keysDown)
-
     render() {
         if (this.paused) {
             requestAnimationFrame(this.render.bind(this));
@@ -185,18 +189,18 @@ class Game {
         }
     }
 
-    start() {
-        this.render();
+    togglePause() {
+        if (this.paused === false) {
+            this.paused = true;
+            this.hero.paused = true;
+        } else {
+            this.paused = false;
+            this.hero.paused = false;
+        }
     }
 
-    togglePause() {
-        // if (e.key === 80) {
-            if (this.paused === false) {
-                this.paused = true;
-            } else {
-                this.paused = false;
-            }
-        // }
+    start() {
+        this.render();
     }
 }
 
@@ -221,26 +225,23 @@ class Hero {
         this.heroImage = new Image();
         this.heroImage.src = "./assets/knight.png";
 
+        this.paused = false;
         this.keysDown = {};
 
         document.addEventListener("keydown", e => {
             // console.log('key down');
-            if (e.key === "p") {
-                this.togglePause();
+            if (this.paused) {
+                this.keysDown = {};
             } else {
-                if (this.paused) {
-                    return;
-                } else {
-                    this.keysDown[e.keyCode] = true;
-                    console.log(this.keysDown);
-                }
+                this.keysDown[e.keyCode] = true;
+                console.log(this.keysDown);
             }
         }, false);
 
         document.addEventListener("keyup", e => {
             // console.log('key up');
             if (this.paused) {
-                return;
+                this.keysDown = {};
             } else {
                 // console.log(this.keysDown);
                 delete this.keysDown[e.keyCode];
@@ -277,21 +278,8 @@ class Hero {
     }
 
     render(ctx) {
-        ctx.drawImage(this.heroImage, this.x, this.y, 40, 40);
+        ctx.drawImage(this.heroImage, this.x, this.y, 60, 60);
     }
-
-    // update() {        
-    //     this.tickCount += 1;
-    //     if (this.tickCount > this.ticksPerFrame) {
-    //         this.tickCount = 0;
-    //         if (this.frameIndex < this.numberOfFrames - 1) {
-    //             this.frameIndex += 1;
-    //         } else {
-    //             this.frameIndex = 0;
-    //         }
-    //         this.frameIndex += 1;
-    //       }
-    // }
 }
 
 module.exports = Hero;
