@@ -107,61 +107,7 @@ class Game {
         this.points = 0;
         this.paused = false;
         // this.gameOver = false;
-        
-        this.keysDown = {};
-
-        document.addEventListener("keypress", e => {
-            // console.log('key press');
-            if (e.key === "p") {
-                this.togglePause();
-            } else {
-                if (this.paused) {
-                    return;
-                } else {
-                    this.keysDown[e.key] = true;
-                    this.hero.move(e, this.keysDown);
-                }
-            }
-        }, false);
-
-        document.addEventListener("keyup", e => {
-            // console.log('key release');
-            if (this.paused) {
-                return;
-            } else {
-                // console.log(this.keysDown);
-                delete this.keysDown[e.key];
-                this.hero.move(e, this.keysDown);
-
-                // console.log(this.keysDown);
-            }
-        }, false);
     }
-
-    // collideWith(otherObject) {
-    //     if (otherObject instanceof Coin) {
-    //         otherObject.remove();
-    //         return true;
-    //     }
-        // if (otherObject instanceof Monster) {
-        //     this.remove();
-        //     return true;
-        // }
-    // }
-
-    // collideWith(obj2) {
-    //     if (Math.sqrt( Math.pow((this.x - obj2.x), 2) + Math.pow((this.y - obj2.y), 2) ) <= 40) {
-    //         console.log("collision");
-    //         obj2.remove();
-    //         return true;
-    //     } 
-    //     // else if (obj1.y <= obj2.y) {
-    //     //     return true;
-    //     // } 
-    //     else {
-    //         return false;
-    //     }
-    // }
 
     remove(object) {
         if (object instanceof __WEBPACK_IMPORTED_MODULE_1__coin___default.a) {
@@ -222,15 +168,19 @@ class Game {
     // update(this.keysDown)
 
     render() {
-        const now = Date.now();
-        // const delta = now - then;
         if (this.paused) {
             requestAnimationFrame(this.render.bind(this));
         } else {
+            const now = Date.now();
+            var delta = now - then;
+            // console.log(delta);
+            this.hero.move(delta / 1000);
+
             this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
             this.ctx.drawImage(this.background, 0, 0);
             this.generateCoins();
             this.renderAllObjects();
+            then = now;
             requestAnimationFrame(this.render.bind(this));
         }
     }
@@ -250,6 +200,8 @@ class Game {
     }
 }
 
+var then = Date.now();
+
 Game.WIDTH = 660;
 Game.HEIGHT = 500;
 Game.NUM_MONSTERS = 3;
@@ -263,12 +215,70 @@ Game.NUM_COINS = 4;
 
 class Hero {
     constructor(x, y) {
-        this.speed = 10;
+        this.speed = 250;
         this.x = x;
         this.y = y;
         this.heroImage = new Image();
         this.heroImage.src = "./assets/knight.png";
+
+        this.keysDown = {};
+
+        document.addEventListener("keydown", e => {
+            // console.log('key down');
+            if (e.key === "p") {
+                this.togglePause();
+            } else {
+                if (this.paused) {
+                    return;
+                } else {
+                    this.keysDown[e.keyCode] = true;
+                    console.log(this.keysDown);
+                }
+            }
+        }, false);
+
+        document.addEventListener("keyup", e => {
+            // console.log('key up');
+            if (this.paused) {
+                return;
+            } else {
+                // console.log(this.keysDown);
+                delete this.keysDown[e.keyCode];
+                console.log(this.keysDown);
+            }
+        }, false);
     } 
+
+    move(modifier) {
+        // holding left, 'a' or arrow
+        if (65 in this.keysDown || 37 in this.keysDown)  {
+            if (this.x > 30) {    
+                this.x -= this.speed * modifier;
+            }
+        }
+        // holding right, 'd' or arrow
+        if (68 in this.keysDown || 39 in this.keysDown) {
+            if (this.x < 600) {    
+                this.x += this.speed * modifier;
+            }
+        }
+        // holding up, 'w' or arrow
+        if (87 in this.keysDown || 38 in this.keysDown) {
+            if (this.y > 40) {    
+                this.y -= this.speed * modifier;
+            }
+        }
+        // holding down, 's' or arrow
+        if (83 in this.keysDown || 40 in this.keysDown) {
+            if (this.y < 420) {    
+                this.y += this.speed * modifier;
+            }
+        }
+    }
+
+    render(ctx) {
+        ctx.drawImage(this.heroImage, this.x, this.y, 40, 40);
+    }
 
     // update() {        
     //     this.tickCount += 1;
@@ -282,35 +292,6 @@ class Hero {
     //         this.frameIndex += 1;
     //       }
     // }
-
-    move(event, keysDown) {
-        // console.log(keysDown);
-        if ("a" in keysDown) {
-            if (this.x > 30) {    
-                this.x -= this.speed;
-            }
-        }
-        if ("d" in keysDown) {
-            if (this.x < 600) {    
-                this.x += this.speed;
-            }
-        }
-        if ("w" in keysDown) {
-            if (this.y > 40) {    
-                this.y -= this.speed;
-            }
-        }
-        if ("s" in keysDown) {
-            if (this.y < 420) {    
-                this.y += this.speed;
-            }
-        }
-    }
-
-    render(ctx) {
-        // this.update(this);
-        ctx.drawImage(this.heroImage, this.x, this.y, 40, 40);
-    }
 }
 
 module.exports = Hero;
