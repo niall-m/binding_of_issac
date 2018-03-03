@@ -219,7 +219,7 @@ Game.NUM_COINS = 4;
 
 class Hero {
     constructor(x, y) {
-        this.speed = 250;
+        this.speed = 300;
         this.x = x;
         this.y = y;
         this.heroImage = new Image();
@@ -234,7 +234,7 @@ class Hero {
                 this.keysDown = {};
             } else {
                 this.keysDown[e.keyCode] = true;
-                console.log(this.keysDown);
+                // console.log(this.keysDown);
             }
         }, false);
 
@@ -245,7 +245,7 @@ class Hero {
             } else {
                 // console.log(this.keysDown);
                 delete this.keysDown[e.keyCode];
-                console.log(this.keysDown);
+                // console.log(this.keysDown);
             }
         }, false);
     } 
