@@ -100,8 +100,9 @@ class Game {
         this.background.src = "./assets/canvas_background.png";
         
         this.backgroundSound = new Audio("./assets/tekno.wav");
-        this.backgroundSound.volume = 0.3;
+        this.backgroundSound.volume = 0.25;
         this.backgroundSound.play();
+        this.backgroundSound.loop = true;
         this.playSound = true;
 
         this.hero = new __WEBPACK_IMPORTED_MODULE_0__hero___default.a(100, 100);
@@ -121,7 +122,7 @@ class Game {
 
         document.getElementById("musicBtn").addEventListener("click", e => {
             this.toggleSound();
-        });
+        }, false);
         
     }
 
@@ -138,11 +139,13 @@ class Game {
     coinCollisions() {
         this.coins.forEach(coin => {
             if (coin.collideWith(this.hero)) {
-                let coinSound = new Audio("./assets/smw_coin.wav");
-                coinSound.volume = 1;
-                coinSound.play();
                 this.points += 1;
                 this.remove(coin);
+                if (this.playSound) {
+                    let coinSound = new Audio("./assets/smw_coin.wav");
+                    coinSound.volume = 1;
+                    coinSound.play();
+                }
             }
         });
     }
@@ -183,28 +186,30 @@ class Game {
     }
 
     toggleSound() {
-        if (this.playSound === true) {
+        if (this.playSound) {
             this.playSound = false;
             this.backgroundSound.pause();
+            this.hero.sound = false;
         } else {
             this.playSound = true;
             this.backgroundSound.play();
+            this.hero.sound = true;
         }
     }
     
     togglePause() {
-        if (this.paused === false) {
+        if (this.paused) {
+            this.paused = false;
+            this.hero.paused = false;
+            if (this.playSound) {
+                this.backgroundSound.play();
+            }
+        } else {
             this.paused = true;
             this.hero.paused = true;
             // toggle music with pause does not change boolean value
-            if (this.playSound === true) {
+            if (this.playSound) {
                 this.backgroundSound.pause();
-            }
-        } else {
-            this.paused = false;
-            this.hero.paused = false;
-            if (this.playSound === true) {
-                this.backgroundSound.play();
             }
         }
     }
@@ -257,6 +262,7 @@ class Hero {
         this.heroImage.src = "./assets/knight.png";
         this.flipped = false;
         this.paused = false;
+        this.sound = true;
         this.totalLasers = 2;
         this.leftLasers = [];
         this.rightLasers = [];
@@ -264,16 +270,16 @@ class Hero {
 
         document.addEventListener("keydown", e => {
             if (this.paused) {
-                this.keysDown = {};
-                // removes all actions
+                this.keysDown = {}; // removes all actions failsafe
             } else if (e.keyCode === 32 && this.leftLasers.length + this.rightLasers.length <= this.totalLasers) {
-                let laserSound = new Audio("./assets/Laser_Shoot7.wav");
-                laserSound.volume = 0.1;
-                laserSound.play();
+                if (this.sound) {
+                    let laserSound = new Audio("./assets/Laser_Shoot7.wav");
+                    laserSound.volume = 0.07;
+                    laserSound.play();
+                }
                 if (this.flipped) {
                     this.leftLasers.push([this.x - 15, this.y + 30, 25, 5]);
-                }
-                else {
+                } else {
                     this.rightLasers.push([this.x + 55, this.y + 30, 25, 5]);
                 }
             } else { // movement
@@ -282,11 +288,10 @@ class Hero {
         }, false);
 
         document.addEventListener("keyup", e => {
-            if (this.paused) {
+            if (e.keyCode === 32) {
+                e.preventDefault(); // prevents spacebar toggling music
+            } else if (this.paused) {
                 this.keysDown = {};
-            } else if (e.keyCode === 32) {
-                e.preventDefault();
-                // prevents spacebar toggling music
             } else {
                 delete this.keysDown[e.keyCode];
             }
