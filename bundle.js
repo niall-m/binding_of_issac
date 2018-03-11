@@ -129,9 +129,7 @@ class Game {
         this.coins.forEach(coin => {
             if (coin.collideWith(this.hero)) {
                 this.points += 1;
-                // console.log(this.points);
                 this.remove(coin);
-                return true;
             }
         });
     }
@@ -153,8 +151,8 @@ class Game {
     generateCoins() {
         if (this.coins.length < Game.NUM_COINS) {
             const c = new __WEBPACK_IMPORTED_MODULE_1__coin___default.a(
-                this.randomInt(100, Game.WIDTH - 100), 
-                this.randomInt(100, Game.HEIGHT - 100)
+                this.randomInt(50, Game.WIDTH - 100), 
+                this.randomInt(50, Game.HEIGHT - 100)
             );
             this.coins.push(c);
         }
@@ -177,7 +175,7 @@ class Game {
         } else {
             const now = Date.now();
             var delta = now - then;
-            // console.log(delta);
+
             this.hero.moveLaser();
             this.hero.move(delta / 1000);
 
@@ -192,6 +190,10 @@ class Game {
         }
     }
 
+    start() {
+        this.render();
+    }
+    
     togglePause() {
         if (this.paused === false) {
             this.paused = true;
@@ -201,18 +203,14 @@ class Game {
             this.hero.paused = false;
         }
     }
-
-    start() {
-        this.render();
-    }
 }
 
 var then = Date.now();
 
 Game.WIDTH = 660;
 Game.HEIGHT = 500;
-Game.NUM_MONSTERS = 3;
-Game.NUM_COINS = 4;
+Game.NUM_MONSTERS = 4;
+Game.NUM_COINS = 3;
 
 /* harmony default export */ __webpack_exports__["a"] = (Game);
 
@@ -229,45 +227,48 @@ class Hero {
         this.heroImage.src = "./assets/knight.png";
         this.flipped = false;
         this.paused = false;
+        this.totalLasers = 2;
         this.leftLasers = [];
         this.rightLasers = [];
         this.keysDown = {};
 
         document.addEventListener("keydown", e => {
-            // console.log('key down');
             if (this.paused) {
-                this.keysDown = {};
-            } else {
+                this.keysDown = {}; // removes all actions
+            } else if (e.keyCode === 32 && this.leftLasers.length + this.rightLasers.length <= this.totalLasers) {
+                if (this.flipped) {
+                    this.leftLasers.push([this.x - 15, this.y + 30, 25, 5]);
+                }
+                else {
+                    this.rightLasers.push([this.x + 55, this.y + 30, 25, 5]);
+                }
+            } else { // movement
                 this.keysDown[e.keyCode] = true;
-                // console.log(this.keysDown);
             }
         }, false);
 
         document.addEventListener("keyup", e => {
-            // console.log('key up');
             if (this.paused) {
                 this.keysDown = {};
             } else {
-                // console.log(this.keysDown);
                 delete this.keysDown[e.keyCode];
-                // console.log(this.keysDown);
             }
         }, false);
     } 
 
-    move(modifier) {
+    move(modifier) { // modifier is time delta / 1000 
         // holding left, 'a' or arrow
         if (65 in this.keysDown || 37 in this.keysDown)  {
+            this.flipped = true;
             if (this.x > 20) {    
                 this.x -= this.speed * modifier;
-                this.flipped = true;
             }
         }
         // holding right, 'd' or arrow
         if (68 in this.keysDown || 39 in this.keysDown) {
+            this.flipped = false;
             if (this.x < 580) {
                 this.x += this.speed * modifier;
-                this.flipped = false;
             }
         }
         // holding up, 'w' or arrow
@@ -280,15 +281,6 @@ class Hero {
         if (83 in this.keysDown || 40 in this.keysDown) {
             if (this.y < 405) {    
                 this.y += this.speed * modifier;
-            }
-        }
-        // shoot a laser
-        if (32 in this.keysDown) {
-            if (this.flipped) {
-                this.leftLasers.push([this.x - 15, this.y + 30, 20, 5]);
-            }
-            else {
-                this.rightLasers.push([this.x + 55, this.y + 30, 20, 5]);
             }
         }
     }
@@ -308,12 +300,13 @@ class Hero {
     }
 
     moveLaser() {
-        // console.log("moving");
         for (let i = 0; i < this.leftLasers.length; i++) {
             if (this.leftLasers[i][0] > 0) {
+                // move laser 10 pixels per animation tick if in bounds
                 this.leftLasers[i][0] -= 10;
             } else if (this.leftLasers[i][0] < 0) {
                 this.leftLasers.splice(i, 1);
+                // remove laser from array if out of bounds of canvas
             }
         }
         for (let i = 0; i < this.rightLasers.length; i++) {
