@@ -99,6 +99,11 @@ class Game {
         this.background = new Image();
         this.background.src = "./assets/canvas_background.png";
         
+        this.backgroundSound = new Audio("./assets/tekno.wav");
+        this.backgroundSound.volume = 0.3;
+        this.backgroundSound.play();
+        this.playSound = true;
+
         this.hero = new __WEBPACK_IMPORTED_MODULE_0__hero___default.a(100, 100);
         this.coins = [];
         // this.monsters = [];
@@ -113,6 +118,11 @@ class Game {
                 this.togglePause();
             }
         });
+
+        document.getElementById("musicBtn").addEventListener("click", e => {
+            this.toggleSound();
+        });
+        
     }
 
     remove(object) {
@@ -172,6 +182,33 @@ class Game {
         this.allObjects().forEach((obj) => obj.render(this.ctx));
     }
 
+    toggleSound() {
+        if (this.playSound === true) {
+            this.playSound = false;
+            this.backgroundSound.pause();
+        } else {
+            this.playSound = true;
+            this.backgroundSound.play();
+        }
+    }
+    
+    togglePause() {
+        if (this.paused === false) {
+            this.paused = true;
+            this.hero.paused = true;
+            // toggle music with pause does not change boolean value
+            if (this.playSound === true) {
+                this.backgroundSound.pause();
+            }
+        } else {
+            this.paused = false;
+            this.hero.paused = false;
+            if (this.playSound === true) {
+                this.backgroundSound.play();
+            }
+        }
+    }
+
     render() {
         if (this.paused) {
             requestAnimationFrame(this.render.bind(this));
@@ -195,16 +232,6 @@ class Game {
 
     start() {
         this.render();
-    }
-    
-    togglePause() {
-        if (this.paused === false) {
-            this.paused = true;
-            this.hero.paused = true;
-        } else {
-            this.paused = false;
-            this.hero.paused = false;
-        }
     }
 }
 
@@ -237,7 +264,8 @@ class Hero {
 
         document.addEventListener("keydown", e => {
             if (this.paused) {
-                this.keysDown = {}; // removes all actions
+                this.keysDown = {};
+                // removes all actions
             } else if (e.keyCode === 32 && this.leftLasers.length + this.rightLasers.length <= this.totalLasers) {
                 let laserSound = new Audio("./assets/Laser_Shoot7.wav");
                 laserSound.volume = 0.1;
@@ -256,6 +284,9 @@ class Hero {
         document.addEventListener("keyup", e => {
             if (this.paused) {
                 this.keysDown = {};
+            } else if (e.keyCode === 32) {
+                e.preventDefault();
+                // prevents spacebar toggling music
             } else {
                 delete this.keysDown[e.keyCode];
             }
