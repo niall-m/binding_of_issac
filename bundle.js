@@ -128,6 +128,9 @@ class Game {
     coinCollisions() {
         this.coins.forEach(coin => {
             if (coin.collideWith(this.hero)) {
+                let coinSound = new Audio("./assets/smw_coin.wav");
+                coinSound.volume = 1;
+                coinSound.play();
                 this.points += 1;
                 this.remove(coin);
             }
@@ -236,6 +239,9 @@ class Hero {
             if (this.paused) {
                 this.keysDown = {}; // removes all actions
             } else if (e.keyCode === 32 && this.leftLasers.length + this.rightLasers.length <= this.totalLasers) {
+                let laserSound = new Audio("./assets/Laser_Shoot7.wav");
+                laserSound.volume = 0.1;
+                laserSound.play();
                 if (this.flipped) {
                     this.leftLasers.push([this.x - 15, this.y + 30, 25, 5]);
                 }
