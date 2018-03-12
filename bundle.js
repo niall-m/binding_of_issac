@@ -88,31 +88,30 @@ document.addEventListener("DOMContentLoaded", () => {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__hero___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__hero__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__coin__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__coin___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__coin__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__monster__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__monster___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__monster__);
 
 
-// import Monster from "./monster";
-// import Laser from "./laser";
+
 
 class Game {
     constructor(ctx) {
         this.ctx = ctx;
         this.background = new Image();
         this.background.src = "./assets/canvas_background.png";
-        
         this.backgroundSound = new Audio("./assets/tekno.wav");
         this.backgroundSound.volume = 0.25;
-        this.backgroundSound.play();
         this.backgroundSound.loop = true;
+        this.backgroundSound.play();
         this.playSound = true;
-
-        this.hero = new __WEBPACK_IMPORTED_MODULE_0__hero___default.a(100, 100);
-        this.coins = [];
-        // this.monsters = [];
-        // this.lasers = [];
-        
-        this.points = 0;
         this.paused = false;
         // this.gameOver = false;
+
+        this.hero = new __WEBPACK_IMPORTED_MODULE_0__hero___default.a(300, 200);
+        this.coins = [];
+        this.leftMonsters = [];
+        this.rightMonsters = [];
+        this.points = 0;
 
         document.addEventListener("keydown", e => {
             if (e.keyCode === 80) {
@@ -123,7 +122,6 @@ class Game {
         document.getElementById("musicBtn").addEventListener("click", e => {
             this.toggleSound();
         }, false);
-        
     }
 
     remove(object) {
@@ -173,13 +171,50 @@ class Game {
             this.coins.push(c);
         }
     }
+    
+    generateMonsters() {
+        if (this.leftMonsters.length + this.rightMonsters.length < Game.NUM_MONSTERS) {
+            let r = Math.floor(Math.random() * 2);
+            if (r === 0) {
+                const m = new __WEBPACK_IMPORTED_MODULE_2__monster___default.a(
+                    0,
+                    this.randomInt(0, Game.HEIGHT - 110),
+                    true
+                );
+                this.leftMonsters.push(m);
+            } else {
+                const m = new __WEBPACK_IMPORTED_MODULE_2__monster___default.a(
+                    Game.WIDTH - 100,
+                    this.randomInt(0, Game.HEIGHT - 110),
+                    false
+                );
+                this.rightMonsters.push(m);
+            }
+        }
+    }
+
+    moveMonsters(modifier) {
+        for (let i = 0; i < this.leftMonsters.length; i++) {
+            if (this.leftMonsters[i].x < 660) {
+                this.leftMonsters[i].move(modifier);
+            } else {
+                this.leftMonsters.splice(i, 1);
+            }
+        }
+        for (let i = 0; i < this.rightMonsters.length; i++) {
+            if (this.rightMonsters[i].x > 0) {
+                this.rightMonsters[i].move(modifier);
+            } else {
+                this.rightMonsters.splice(i, 1);
+            }
+        }
+    }
 
     allObjects() {
-        return [].concat(this.hero, this.coins);
+        return [].concat(this.hero, this.coins, this.leftMonsters, this.rightMonsters);
     }
 
     renderAllObjects() {
-        // console.log(this.allObjects());
         this.checkCollisions();
         this.updatePoints();
         this.allObjects().forEach((obj) => obj.render(this.ctx));
@@ -221,12 +256,14 @@ class Game {
             const now = Date.now();
             var delta = now - then;
 
+            this.moveMonsters(delta / 1000);
             this.hero.moveLaser();
             this.hero.move(delta / 1000);
 
             this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
             this.ctx.drawImage(this.background, 0, 0);
             this.generateCoins();
+            this.generateMonsters();
             this.renderAllObjects();
             this.hero.drawLaser(this.ctx);
 
@@ -244,7 +281,7 @@ var then = Date.now();
 
 Game.WIDTH = 660;
 Game.HEIGHT = 500;
-Game.NUM_MONSTERS = 4;
+Game.NUM_MONSTERS = 3;
 Game.NUM_COINS = 3;
 
 /* harmony default export */ __webpack_exports__["a"] = (Game);
@@ -346,7 +383,7 @@ class Hero {
             if (this.leftLasers[i][0] > 0) {
                 // move laser 10 pixels per animation tick if in bounds
                 this.leftLasers[i][0] -= 10;
-            } else if (this.leftLasers[i][0] < 0) {
+            } else {
                 this.leftLasers.splice(i, 1);
                 // remove laser from array if out of bounds of canvas
             }
@@ -354,7 +391,7 @@ class Hero {
         for (let i = 0; i < this.rightLasers.length; i++) {
             if (this.rightLasers[i][0] < 660) {
                 this.rightLasers[i][0] += 10;
-            } else if (this.rightLasers[i][0] > 660) {
+            } else {
                 this.rightLasers.splice(i, 1);
             }
         }
@@ -407,6 +444,14 @@ class Coin {
           }
     }
 
+    collideWith(obj2) {
+        if (Math.sqrt( Math.pow((this.x - obj2.x), 2) + Math.pow((this.y - obj2.y), 2) ) <= 50) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     render(ctx) {
         this.update(this);
         ctx.drawImage(
@@ -421,22 +466,44 @@ class Coin {
             this.height
         );
     }
+}
 
-    collideWith(obj2) {
-        if (Math.sqrt( Math.pow((this.x - obj2.x), 2) + Math.pow((this.y - obj2.y), 2) ) <= 50) {
-            // console.log("collision");
-            return true;
+module.exports = Coin;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+class Monster {
+    constructor(x, y, boolean) {
+        this.speed = 200;
+        this.x = x;
+        this.y = y;
+        this.monsterImage = new Image();
+        this.monsterImage.src = "./assets/dragon.png";
+        this.flipped = boolean;
+    }
+
+    move(modifier) {
+        if (this.flipped) {
+            this.x += this.speed * modifier;
+        } else {
+            this.x -= this.speed * modifier;
         }
-        // else if (obj1.y <= obj2.y) {
-        //     return true;
-        // } 
-        else {
-            return false;
+    }
+    
+    render(ctx) {
+        if (this.flipped) {
+            ctx.scale(-1,1);
+            ctx.drawImage(this.monsterImage, -this.x - 100, this.y, 100, 100);
+            ctx.scale(-1,1);
+        } else {
+            ctx.drawImage(this.monsterImage, this.x, this.y, 100, 100);
         }
     }
 }
 
-module.exports = Coin;
+module.exports = Monster;
 
 /***/ })
 /******/ ]);
