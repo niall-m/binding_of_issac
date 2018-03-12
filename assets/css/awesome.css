@@ -38,6 +38,6 @@ body {
     padding: 10px;
 }
 
-#points-display {
-
+#game-over {
+    cursor: pointer;
 }
