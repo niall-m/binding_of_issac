@@ -414,12 +414,12 @@ class Hero {
         }
     }
       
-    // collideWith(obj2) {
-    //     if (Math.sqrt( Math.pow((this.x - obj2.x), 2) + Math.pow((this.y - obj2.y), 2) ) <= 50) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
+    collideWith(obj2) {
+        if (Math.sqrt( Math.pow((this.x - obj2.x), 2) + Math.pow((this.y - obj2.y), 2) ) <= 50) {
+            return true;
+        }
+        return false;
+    }
 
     render(ctx) {
         if (this.flipped) {
@@ -514,12 +514,12 @@ class Monster {
         }
     }
 
-    // collideWith(obj2) {
-    //     if (Math.sqrt( Math.pow((this.x - obj2.x), 2) + Math.pow((this.y - obj2.y), 2) ) <= 50) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
+    collideWith(obj2) {
+        if (Math.sqrt( Math.pow((this.x - obj2.x), 2) + Math.pow((this.y - obj2.y), 2) ) <= 50) {
+            return true;
+        }
+        return false;
+    }
 
     render(ctx) {
         if (this.flipped) {
