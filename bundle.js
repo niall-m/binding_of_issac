@@ -148,11 +148,22 @@ class Game {
             }
         });
 
-        document.getElementById("musicBtn").addEventListener("click", e => {
+        var element = document.getElementById("musicBtn");
+        element.addEventListener("click", e => {
+            e.preventDefault();
             this.toggleSound();
+            let val = window.getComputedStyle(element.firstElementChild).getPropertyValue('display');
+            if (val === "block") {
+                element.firstElementChild.style.display = "none";
+                element.lastElementChild.style.display = "block";
+            } else {
+                element.firstElementChild.style.display = "block";
+                element.lastElementChild.style.display = "none";
+            }
         }, false);
         
         document.getElementById("game-over").addEventListener("click", e => {
+            e.preventDefault();
             this.reset();
         }, false);
     }
@@ -314,11 +325,13 @@ class Game {
     }
 
     toggleSound() {
-        this.playSound = !this.playSound;
-        if (this.playSound) {
-            this.backgroundSound.play();
-        } else {
-            this.backgroundSound.pause();
+        if (!this.gameOver) {
+            this.playSound = !this.playSound;
+            if (this.playSound) {
+                this.backgroundSound.play();
+            } else {
+                this.backgroundSound.pause();
+            }
         }
     }
     

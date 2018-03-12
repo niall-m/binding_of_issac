@@ -1,6 +1,6 @@
 body {
-    min-height: 100%;
-    min-width: 100%;
+    height: 100%;
+    width: 100%;
     text-align: center;
     position: relative;
     display: flex;
@@ -11,8 +11,8 @@ body {
 
 .main-container {
     margin-top: 100px;
-    min-height: 100%;
-    min-width: 100%;
+    height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -45,6 +45,14 @@ body {
 
 #musicBtn:hover {
     color: white;
+}
+
+#musicBtn :first-child {
+    display: block;
+}
+
+#musicBtn :last-child {
+    display: none;
 }
 
 #game-over {
