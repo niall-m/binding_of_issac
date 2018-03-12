@@ -4,8 +4,9 @@ body {
     text-align: center;
     position: relative;
     display: flex;
-    background-color: black;
+    background: linear-gradient(to right, #070000, #4c0001, #070000);
     color: red;
+    font-family: 'MedievalSharp', cursive;
 }
 
 .main-container {
@@ -36,6 +37,14 @@ body {
     display: flex;
     min-width: 140px;
     padding: 10px;
+}
+
+.info-container a:hover {
+    color: white;
+}
+
+#musicBtn:hover {
+    color: white;
 }
 
 #game-over {
