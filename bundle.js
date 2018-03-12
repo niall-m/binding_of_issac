@@ -124,14 +124,10 @@ class Game {
         }, false);
     }
 
-    remove(object) {
-        if (object instanceof __WEBPACK_IMPORTED_MODULE_1__coin___default.a) {
-            this.coins.splice(this.coins.indexOf(object), 1);
-        } else if (object instanceof __WEBPACK_IMPORTED_MODULE_0__hero___default.a) {
-            this.hero = {};
-        } else {
-            throw "wtf?";
-        }
+    checkCollisions() {
+        this.coinCollisions();
+        this.laserCollisions();
+        this.monsterCollisions();
     }
 
     coinCollisions() {
@@ -148,14 +144,29 @@ class Game {
         });
     }
 
-    updatePoints() {
-        const display = document.getElementById('points-display');
-        display.innerHTML = this.points;
+    laserCollisions() {
+        this.leftMonsters.forEach(monster => {
+            this.hero.leftLasers.forEach(laser => {
+                if (monster.collideWith(laser)) {
+                    this.points += 1;
+                    this.leftMonsters.splice(this.leftMonsters.indexOf(monster), 1);
+                }
+            });
+        });
     }
-    
-    checkCollisions() {
-        this.coinCollisions();
-        
+
+    monsterCollisions() {
+
+    }
+
+    remove(object) {
+        if (object instanceof __WEBPACK_IMPORTED_MODULE_1__coin___default.a) {
+            this.coins.splice(this.coins.indexOf(object), 1);
+        } else if (object instanceof __WEBPACK_IMPORTED_MODULE_0__hero___default.a) {
+            this.hero = {};
+        } else {
+            throw "wtf?";
+        }
     }
 
     randomInt(min, max) {
@@ -194,18 +205,53 @@ class Game {
     }
 
     moveMonsters(modifier) {
-        for (let i = 0; i < this.leftMonsters.length; i++) {
-            if (this.leftMonsters[i].x < 660) {
-                this.leftMonsters[i].move(modifier);
-            } else {
-                this.leftMonsters.splice(i, 1);
+        if (!this.paused) {
+            for (let i = 0; i < this.leftMonsters.length; i++) {
+                if (this.leftMonsters[i].x < 660) {
+                    this.leftMonsters[i].move(modifier);
+                } else {
+                    this.leftMonsters.splice(i, 1);
+                }
+            }
+            for (let i = 0; i < this.rightMonsters.length; i++) {
+                if (this.rightMonsters[i].x > 0) {
+                    this.rightMonsters[i].move(modifier);
+                } else {
+                    this.rightMonsters.splice(i, 1);
+                }
             }
         }
-        for (let i = 0; i < this.rightMonsters.length; i++) {
-            if (this.rightMonsters[i].x > 0) {
-                this.rightMonsters[i].move(modifier);
-            } else {
-                this.rightMonsters.splice(i, 1);
+    }
+
+    updatePoints() {
+        const display = document.getElementById('points-display');
+        display.innerHTML = this.points;
+    }
+
+    toggleSound() {
+        this.playSound = !this.playSound;
+        if (this.playSound) {
+            this.backgroundSound.play();
+            this.hero.sound = true;
+        } else {
+            this.backgroundSound.pause();
+            this.hero.sound = false;
+        }
+    }
+    
+    togglePause() {
+        this.paused = !this.paused;
+        if (this.paused) {
+            this.hero.paused = true;
+            if (this.playSound) {
+                this.backgroundSound.pause();
+                this.hero.sound = false;
+            }
+        } else { // toggle music with pause without changing this.playSound
+            this.hero.paused = false;
+            if (this.playSound) {
+                this.backgroundSound.play();
+                this.hero.sound = true;
             }
         }
     }
@@ -220,45 +266,18 @@ class Game {
         this.allObjects().forEach((obj) => obj.render(this.ctx));
     }
 
-    toggleSound() {
-        if (this.playSound) {
-            this.playSound = false;
-            this.backgroundSound.pause();
-            this.hero.sound = false;
-        } else {
-            this.playSound = true;
-            this.backgroundSound.play();
-            this.hero.sound = true;
-        }
-    }
-    
-    togglePause() {
-        if (this.paused) {
-            this.paused = false;
-            this.hero.paused = false;
-            if (this.playSound) {
-                this.backgroundSound.play();
-            }
-        } else {
-            this.paused = true;
-            this.hero.paused = true;
-            // toggle music with pause does not change boolean value
-            if (this.playSound) {
-                this.backgroundSound.pause();
-            }
-        }
-    }
-
     render() {
         if (this.paused) {
             requestAnimationFrame(this.render.bind(this));
         } else {
             const now = Date.now();
-            var delta = now - then;
+            const delta = Math.min(.1, (now - then) / 1000); 
+            // limits animation loop while paused or blurred
 
-            this.moveMonsters(delta / 1000);
+            this.coins.forEach(coin => coin.update(coin));
             this.hero.moveLaser();
-            this.hero.move(delta / 1000);
+            this.hero.move(delta);
+            this.moveMonsters(delta);
 
             this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
             this.ctx.drawImage(this.background, 0, 0);
@@ -306,9 +325,9 @@ class Hero {
         this.keysDown = {};
 
         document.addEventListener("keydown", e => {
-            if (this.paused) {
-                this.keysDown = {}; // removes all actions failsafe
-            } else if (e.keyCode === 32 && this.leftLasers.length + this.rightLasers.length <= this.totalLasers) {
+            if (e.keyCode === 32 && 
+                this.leftLasers.length + this.rightLasers.length <= this.totalLasers &&
+                !this.paused) {
                 if (this.sound) {
                     let laserSound = new Audio("./assets/laser.wav");
                     laserSound.volume = 0.07;
@@ -327,8 +346,6 @@ class Hero {
         document.addEventListener("keyup", e => {
             if (e.keyCode === 32) {
                 e.preventDefault(); // prevents spacebar toggling music
-            } else if (this.paused) {
-                this.keysDown = {};
             } else {
                 delete this.keysDown[e.keyCode];
             }
@@ -397,6 +414,12 @@ class Hero {
         }
     }
       
+    // collideWith(obj2) {
+    //     if (Math.sqrt( Math.pow((this.x - obj2.x), 2) + Math.pow((this.y - obj2.y), 2) ) <= 50) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     render(ctx) {
         if (this.flipped) {
@@ -447,13 +470,12 @@ class Coin {
     collideWith(obj2) {
         if (Math.sqrt( Math.pow((this.x - obj2.x), 2) + Math.pow((this.y - obj2.y), 2) ) <= 50) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     render(ctx) {
-        this.update(this);
+        // this.update(this);
         ctx.drawImage(
             this.coinImage,
             this.frameIndex * 1000 / this.numberOfFrames,
@@ -491,7 +513,14 @@ class Monster {
             this.x -= this.speed * modifier;
         }
     }
-    
+
+    // collideWith(obj2) {
+    //     if (Math.sqrt( Math.pow((this.x - obj2.x), 2) + Math.pow((this.y - obj2.y), 2) ) <= 50) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
+
     render(ctx) {
         if (this.flipped) {
             ctx.scale(-1,1);
