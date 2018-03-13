@@ -28,15 +28,13 @@ body {
 
 .instruction-container {
     display: block;
-    padding: 10px;
-    min-width: 140px;
+    min-width: 10em;
     min-height: 100px;
 }
 
 .info-container {
-    display: flex;
-    min-width: 140px;
-    padding: 10px;
+    display: block;
+    min-width: 10em;
 }
 
 .info-container a:hover {

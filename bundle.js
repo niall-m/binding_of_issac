@@ -186,7 +186,7 @@ class Game {
     coinCollisions() {
         this.coins.forEach(coin => {
             if (this.collision(coin, this.hero)) {
-                this.points += 1;
+                this.points += 2;
                 this.coins.splice(this.coins.indexOf(coin), 1);
                 if (this.playSound) {
                     let coinSound = new Audio("./assets/coin.wav");
