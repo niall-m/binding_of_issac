@@ -76,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
     const game = new __WEBPACK_IMPORTED_MODULE_0__game_js__["a" /* default */](ctx);
-    game.start();
 });
 
 /***/ }),
@@ -105,8 +104,7 @@ class Game {
         this.backgroundSound = new Audio("./assets/tekno.wav");
         this.backgroundSound.volume = 0.25;
         this.backgroundSound.loop = true;
-        this.backgroundSound.play();
-        this.playSound = true;
+        this.playSound = false;
         this.paused = false;
         this.gameOver = false;
 
@@ -148,22 +146,34 @@ class Game {
             }
         });
 
-        var element = document.getElementById("musicBtn");
-        element.addEventListener("click", e => {
+        var musicBtn = document.getElementById("musicBtn");
+        musicBtn.addEventListener("click", e => {
             e.preventDefault();
             this.toggleSound();
-            let val = window.getComputedStyle(element.firstElementChild).getPropertyValue('display');
+            let val = window.getComputedStyle(musicBtn.firstElementChild).getPropertyValue('display');
             if (val === "block") {
-                element.firstElementChild.style.display = "none";
-                element.lastElementChild.style.display = "block";
+                musicBtn.firstElementChild.style.display = "none";
+                musicBtn.lastElementChild.style.display = "block";
             } else {
-                element.firstElementChild.style.display = "block";
-                element.lastElementChild.style.display = "none";
+                musicBtn.firstElementChild.style.display = "block";
+                musicBtn.lastElementChild.style.display = "none";
             }
         }, false);
         
+        var begin = document.getElementById("start-game");
+        begin.addEventListener("click", e => {
+            e.preventDefault();
+            begin.style.display = "none";
+            this.start();
+        });
+
         document.getElementById("game-over").addEventListener("click", e => {
             e.preventDefault();
+            let val = window.getComputedStyle(musicBtn.firstElementChild).getPropertyValue('display');
+            if (this.gameOver && val === "none") {
+                musicBtn.firstElementChild.style.display = "block";
+                musicBtn.lastElementChild.style.display = "none";
+            } 
             this.reset();
         }, false);
     }
@@ -365,9 +375,9 @@ class Game {
         if (this.paused) {
             requestAnimationFrame(this.render.bind(this));
         } else if (this.gameOver) {
-            this.backgroundSound.pause();
+            if (this.playSound) this.backgroundSound.pause();
             cancelAnimationFrame(requestID);
-            document.getElementById('game-over').style.display = "inherit";
+            document.getElementById('game-over').style.display = "flex";
         } else {
             const now = Date.now();
             const delta = Math.min(.1, (now - then) / 1000); // limits animation loop while paused or blurred
@@ -391,6 +401,8 @@ class Game {
 
     start() {
         this.render();
+        this.playSound = true;
+        this.backgroundSound.play();
         document.getElementById('game-over').style.display = "none";
     }
 
