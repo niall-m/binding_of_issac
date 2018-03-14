@@ -87,3 +87,7 @@ body {
     flex-direction: column;
     background-color: black;
 }
+
+#canvas {
+    cursor: none;
+}
