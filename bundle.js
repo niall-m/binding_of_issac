@@ -102,7 +102,7 @@ class Game {
         this.background = new Image();
         this.background.src = "./assets/canvas_background.png";
         this.backgroundSound = new Audio("./assets/tekno.wav");
-        this.backgroundSound.volume = 0.25;
+        this.backgroundSound.volume = 0.5;
         this.backgroundSound.loop = true;
         this.playSound = false;
         this.paused = false;
@@ -209,7 +209,7 @@ class Game {
 
     laserCollisions() {
         let monsterSound = new Audio("./assets/monster_death.wav");
-        monsterSound.volume = .1;
+        monsterSound.volume = .7;
 
         this.LMonsters.forEach(monster => {
             this.LLasers.forEach(laser => {
@@ -411,7 +411,7 @@ class Game {
         this.background = new Image();
         this.background.src = "./assets/canvas_background.png";
         this.backgroundSound = new Audio("./assets/tekno.wav");
-        this.backgroundSound.volume = 0.25;
+        this.backgroundSound.volume = 0.5;
         this.backgroundSound.loop = true;
         this.backgroundSound.play();
         this.playSound = true;
