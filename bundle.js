@@ -382,7 +382,6 @@ class Game {
             const now = Date.now();
             const delta = Math.min(.1, (now - then) / 1000); // limits animation loop while paused or blurred
 
-            this.coins.forEach(coin => coin.update(coin));
             this.hero.move(delta);
             this.moveMonsters(delta);
             this.moveLasers(delta);
@@ -528,11 +527,11 @@ class Coin {
         this.coinImage.src = "./assets/coin-sprite.png";
         this.frameIndex = 0;
         this.tickCount = 0;
-        this.ticksPerFrame = this.ticksPerFrame || 4;
-        this.numberOfFrames = this.numberOfFrames || 10;
+        this.ticksPerFrame = 4;
+        this.numberOfFrames = 10;
     }
 
-    update() {        
+    update() {
         this.tickCount += 1;
         if (this.tickCount > this.ticksPerFrame) {
             this.tickCount = 0;
@@ -541,16 +540,18 @@ class Coin {
             } else {
                 this.frameIndex = 0;
             }
-            // this.frameIndex += 1;
-          }
+        }
     }
 
+    // 1000 = total px width of src img
+    // first 4 source, last 4 destination
     render(ctx) {
+        this.update(this);
         ctx.drawImage(
             this.coinImage,
             this.frameIndex * 1000 / this.numberOfFrames,
             0,
-            1000 / this.numberOfFrames,
+            100,
             100,
             this.x,
             this.y,
