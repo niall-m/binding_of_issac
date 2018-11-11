@@ -104,7 +104,7 @@ class Game {
         this.backgroundSound = new Audio("./assets/tekno.wav");
         this.backgroundSound.volume = 0.25;
         this.backgroundSound.loop = true;
-        this.playSound = false;
+        this.playSound = true;
         this.paused = false;
         this.gameOver = false;
 
@@ -116,7 +116,13 @@ class Game {
         this.RLasers = [];
         this.points = 0;
 
+        this.totalSeconds = 0;
+        setInterval(this.updateTimer.bind(this), 1000);
+        
         document.addEventListener("keydown", e => {
+            if (e.keyCode === 32 || e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40) {
+                e.preventDefault();
+            }
             if (e.keyCode === 80) {
                 this.togglePause();
             } else if (e.keyCode === 32 && 
@@ -149,14 +155,16 @@ class Game {
         var musicBtn = document.getElementById("musicBtn");
         musicBtn.addEventListener("click", e => {
             e.preventDefault();
-            this.toggleSound();
-            let val = window.getComputedStyle(musicBtn.firstElementChild).getPropertyValue('display');
-            if (val === "block") {
-                musicBtn.firstElementChild.style.display = "none";
-                musicBtn.lastElementChild.style.display = "block";
-            } else {
-                musicBtn.firstElementChild.style.display = "block";
-                musicBtn.lastElementChild.style.display = "none";
+            if (!this.gameOver) {
+                this.toggleSound();
+                let val = window.getComputedStyle(musicBtn.firstElementChild).getPropertyValue('display');
+                if (val === "block") {
+                    musicBtn.firstElementChild.style.display = "none";
+                    musicBtn.lastElementChild.style.display = "block";
+                } else {
+                    musicBtn.firstElementChild.style.display = "block";
+                    musicBtn.lastElementChild.style.display = "none";
+                }
             }
         }, false);
         
@@ -169,19 +177,15 @@ class Game {
 
         document.getElementById("game-over").addEventListener("click", e => {
             e.preventDefault();
-            let val = window.getComputedStyle(musicBtn.firstElementChild).getPropertyValue('display');
-            if (this.gameOver && val === "none") {
-                musicBtn.firstElementChild.style.display = "block";
-                musicBtn.lastElementChild.style.display = "none";
-            } 
             this.reset();
         }, false);
     }
 
-    // collision(obj1, obj2) {
-    //     if (Math.sqrt(Math.pow((obj1.x - obj2.x), 2) + Math.pow((obj1.y - obj2.y), 2)) <= obj1.width) return true;
-    //     return false;
-    // }
+    updateTimer() {
+        if (this.paused || this.gameOver) return;
+        this.totalSeconds++;
+        if (this.totalSeconds % 7 === 0) Game.NUM_MONSTERS++;
+    }
 
     collision(object1, object2) {
         if (object1.x < object2.x + object2.width / 2 && 
@@ -335,13 +339,11 @@ class Game {
     }
 
     toggleSound() {
-        if (!this.gameOver) {
-            this.playSound = !this.playSound;
-            if (this.playSound) {
-                this.backgroundSound.play();
-            } else {
-                this.backgroundSound.pause();
-            }
+        this.playSound = !this.playSound;
+        if (this.playSound) {
+            this.backgroundSound.play();
+        } else {
+            this.backgroundSound.pause();
         }
     }
     
@@ -400,8 +402,12 @@ class Game {
 
     start() {
         this.render();
-        this.playSound = true;
-        this.backgroundSound.play();
+        if (this.playSound) {
+            this.backgroundSound = new Audio("./assets/tekno.wav");
+            this.backgroundSound.volume = 0.25;
+            this.backgroundSound.loop = true;
+            this.backgroundSound.play();
+        }
         document.getElementById('game-over').style.display = "none";
     }
 
@@ -409,11 +415,7 @@ class Game {
 		document.getElementById('game-over').style.display = "none";
         this.background = new Image();
         this.background.src = "./assets/canvas_background.png";
-        this.backgroundSound = new Audio("./assets/tekno.wav");
-        this.backgroundSound.volume = 0.25;
-        this.backgroundSound.loop = true;
-        this.backgroundSound.play();
-        this.playSound = true;
+        if (this.playSound) this.backgroundSound = null; // prevent overlapping soundtracks
         this.paused = false;
         this.gameOver = false;
 
@@ -424,6 +426,9 @@ class Game {
         this.LLasers = [];
         this.RLasers = [];
         this.points = 0;
+        this.totalSeconds = 0;
+
+        Game.NUM_MONSTERS = 0;
 
         this.start();
     }
@@ -435,8 +440,8 @@ var requestID;
 Game.WIDTH = 660;
 Game.HEIGHT = 500;
 Game.NUM_LASERS = 2;
-Game.NUM_MONSTERS = 3;
 Game.NUM_COINS = 3;
+Game.NUM_MONSTERS = 0;
 
 /* harmony default export */ __webpack_exports__["a"] = (Game);
 
